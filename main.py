@@ -6,7 +6,7 @@ class TipoAtivo(Enum):
     SERVIDOR = 2
     IMPRESSORA = 3
     BANCO_DE_DADOS = 4
-    PCs = 5
+    PCS = 5
 
 ###    Protótipos de Funções que vou chamar lá no Main()
 def cadastro_ativo():
@@ -33,29 +33,30 @@ def menu():
      print("4. Atualizar Ativo")
      print("5. Excluir Ativo")
      print("0. Sair")
-
-#definindo a função principal do programa, que vai chamar o menu e as funções de acordo com a opção escolhida pelo usuário
-#respeitando good pratices de programação. usando o loop para criar um menu interativo que só vai sair quando o usuário escolher a opção de sair.
+#Dispatch Table para boas práticas e aproveitamento de memória
+opcoes = {
+    "1": cadastro_ativo,
+    "2": lista_ativos,
+    "3": loc_ativo,
+    "4": att_ativo,
+    "5": del_ativo,
+}
+# Aqui eu chamo a função main, crio o loop com apenas uma condicional e quebro ele se a pessoa escolher 0, criando esse feedback interativo
 def main():
     while True:
         menu()
         opcao = input("Escolha uma opção: ")
 
-        if opcao == "1":
-            cadastro_ativo()
-        elif opcao == "2":
-            lista_ativos()
-        elif opcao == "3":
-            loc_ativo()
-        elif opcao == "4":
-            att_ativo()
-        elif opcao == "5":
-            del_ativo()
-        elif opcao == "0":
+        if opcao == "0":
             print("Saindo do programa...")
             break
-        else:
+        #O get pega o input do usuário e analisa atráves da key do dict respectivo; também coloco uma condição para evitar que a pessoa escolha uma opção incorreta
+        user_input = opcoes.get(opcao)
+
+        if user_input is None:
             print("Opção inválida. Tente novamente.")
+        else:
+            user_input()
 
 if __name__ == "__main__":
     main()
