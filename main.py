@@ -34,10 +34,15 @@ def cadastro_ativo():
     except ValueError:
         print("Entrada Inválida, tente novamente!")
 
-
     
 def lista_ativos():
     print("\n --- Listando Ativos ---")
+    if not ativosM:
+        print("Nenhum ativo cadastrado no momento!")
+    else:
+        for ativo in ativosM:
+            print(f"ID: {id_ativo} | Nome: {dados['nome']} | Tipo: {dados['tipo']}")
+            
 def loc_ativo():
     print("\n --- Buscando Ativo ---")
 def att_ativo():
