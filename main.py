@@ -45,10 +45,138 @@ def lista_ativos():
             
 def loc_ativo():
     print("\n --- Buscando Ativo ---")
+    if not ativosM:
+        print("Nenhum arquivo cadastrado")
+        return 
+    search = input("Digite o ID do arquivo: ")
+    if search.isdigit():
+        id_search = int(busca)
+        if id_search in ativosM:
+            dados = ativosM[id_search]
+        print(f"ID: {id_search} | Nome: {dados['nome']} | Responsável: {dados['responsavel']} | Setor: {dados['setor']}") | Tipo: {dados['tipo']}")
+        return 
+
 def att_ativo():
     print("\n --- Atualizando Ativo ---")
+    if not ativosM:
+        print("Nenhum ativo cadastrado no momento!")
+        return
+
+    try:
+        id_ativo = int(input("Digite o ID do ativo que deseja atualizar: "))
+    except ValueError:
+        print("ID inválido, deve ser um número inteiro.")
+        return
+
+    if id_ativo not in ativosM:
+        print("Ativo não encontrado.")
+        return
+
+    dados = ativosM[id_ativo]
+    print(f"Atualizando ativo: {dados['nome']} (deixe em branco pra não alterar um campo)")
+
+    novo_nome = input(f"Novo nome [{dados['nome']}]: ").strip()
+    novo_responsavel = input(f"Novo responsável [{dados['responsavel']}]: ").strip()
+    novo_setor = input(f"Novo setor [{dados['setor']}]: ").strip()
+
+    if novo_nome:
+        dados["nome"] = novo_nome
+    if novo_responsavel:
+        dados["responsavel"] = novo_responsavel
+    if novo_setor:
+        dados["setor"] = novo_setor
+
+    print("Ativo atualizado com sucesso!")
+
 def del_ativo():
     print("\n --- Excluindo Ativo ---")
+    if not ativosM:
+        print("Nenhum ativo cadastrado no momento!")
+        return
+
+    try:
+        id_ativo = int(input("Digite o ID do ativo que deseja excluir: "))
+    except ValueError:
+        print("ID inválido, deve ser um número inteiro.")
+        return
+
+    if id_ativo not in ativosM:
+        print("Ativo não encontrado.")
+        return
+
+    nome = ativosM[id_ativo]["nome"]
+    del ativosM[id_ativo]
+    print(f"Ativo {nome} (e suas vulnerabilidades) foi excluído com sucesso!")
+
+def cadastro_vulnerabilidade():
+    print("\n --- Cadastrando Vulnerabilidade ---")
+    if not ativosM:
+        print("Nenhum ativo cadastrado no momento!")
+        return
+
+    try:
+        id_ativo = int(input("Digite o ID do ativo: "))
+    except ValueError:
+        print("ID inválido, deve ser um número inteiro.")
+        return
+
+    if id_ativo not in ativosM:
+        print("Ativo não encontrado.")
+        return
+
+    descricao = input("Descrição da vulnerabilidade: ")
+    categoria = input("Categoria (ex: senha fraca, falha de configuração): ")
+
+    print("Selecione a severidade:")
+    for s in severidade:
+        print(f"{s.value}. {s.name}")
+
+    print("Selecione o status:")
+    for st in status_vulnerabilidade:
+        print(f"{st.value}. {st.name}")
+
+    try:
+        sev_escolhida = int(input("Número da severidade: "))
+        status_escolhido = int(input("Número do status: "))
+
+        sev = severidade(sev_escolhida)
+        status = status_vulnerabilidade(status_escolhido)
+
+        ativosM[id_ativo]["vulnerabilidades"].append({
+            "descricao": descricao,
+            "categoria": categoria,
+            "severidade": sev.name,
+            "status": status.name
+        })
+
+        print("Vulnerabilidade cadastrada com sucesso!")
+    except ValueError:
+        print("Entrada inválida, tente novamente!")
+
+def visualizar_vulnerabilidades():
+    print("\n --- Vulnerabilidades do Ativo ---")
+    if not ativosM:
+        print("Nenhum ativo cadastrado no momento!")
+        return
+
+    try:
+        id_ativo = int(input("Digite o ID do ativo: "))
+    except ValueError:
+        print("ID inválido, deve ser um número inteiro.")
+        return
+
+    if id_ativo not in ativosM:
+        print("Ativo não encontrado.")
+        return
+
+    vulns = ativosM[id_ativo]["vulnerabilidades"]
+
+    if not vulns:
+        print("Este ativo está sem vulnerabilidades registradas.")
+    else:
+        for i, v in enumerate(vulns, start=1):
+            print(f"{i}. {v['descricao']} | Categoria: {v['categoria']} "
+                  f"| Severidade: {v['severidade']} | Status: {v['status']}")
 
 
 
