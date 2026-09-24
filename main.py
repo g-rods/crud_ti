@@ -1,7 +1,7 @@
 from enum import Enum
 
 #enumeração para os tipos de ativos
-class TipoAtivo(Enum):
+class tipo_ativo(Enum):
     NOTEBOOK = 1
     SERVIDOR = 2
     IMPRESSORA = 3
@@ -11,6 +11,31 @@ class TipoAtivo(Enum):
 ###    Protótipos de Funções que vou chamar lá no Main()
 def cadastro_ativo():
     print("\n --- Cadastrando Ativo ---")
+    if ativosM:
+        id_ativo = max(ativosM.keys()) + 1
+    else:
+        id_ativo = 1
+
+    name = input("Selecione o nome do ativo que você queira cadastrar: ")
+
+    print("Selecione o tipo do ativo\n")
+    for _ in tipo_ativo:
+        print(f"{_.value}. {_.name}")
+    try:
+        escolhido = int(input("Escolha o número do tipo:"))
+        tipo = tipo_ativo(escolhido)
+
+        ativosM[id_ativo] = {
+            "nome": name,
+            "tipo": tipo.name
+        }
+
+        print(f"Sucesso! o {name} foi cadastrado!")
+    except ValueError:
+        print("Entrada Inválida, tente novamente!")
+
+
+    
 def lista_ativos():
     print("\n --- Listando Ativos ---")
 def loc_ativo():
@@ -24,7 +49,7 @@ def del_ativo():
 
 ativosM = {}
 
-#construindo a função para printar o menu e pedir a opção do usuário para deixar o código mais limpo e legível
+### construindo a função para printar o menu e pedir a opção do usuário para deixar o código mais limpo e legível
 def menu():
      print("\n --- Menu de Gerenciamento de Ativos ---")
      print("1. Cadastrar Ativo")
@@ -51,6 +76,7 @@ def main():
             print("Saindo do programa...")
             break
         #O get pega o input do usuário e analisa atráves da key do dict respectivo; também coloco uma condição para evitar que a pessoa escolha uma opção incorreta
+        # e printando a string respectiva a key que o cara escolheu 
         user_input = opcoes.get(opcao)
 
         if user_input is None:
