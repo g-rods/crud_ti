@@ -1,6 +1,7 @@
 from enum import Enum
+from persistencia import salvar_dados, carregar_dados
 
-#enumeração para os tipos de ativos
+# enumeração para os tipos de ativos
 class tipo_ativo(Enum):
     NOTEBOOK = 1
     SERVIDOR = 2
@@ -8,7 +9,25 @@ class tipo_ativo(Enum):
     BANCO_DE_DADOS = 4
     PCS = 5
 
-###    Protótipos de Funções que vou chamar lá no Main()
+# enumeração de risco de vulnerabilidade
+class severidade(Enum):
+    BAIXA = 1
+    MEDIA = 2
+    ALTA = 3
+    CRITICA = 4
+
+# enumeração para status de tratamento da vulnerabilidade
+class status_vulnerabilidade(Enum):
+    ABERTA = 1
+    EM_TRATAMENTO = 2
+    SOOOULVEEED = 3
+    GRAVE_RISCO = 4
+
+
+ativosM = carregar_dados()
+
+
+## funções
 def cadastro_ativo():
     print("\n --- Cadastrando Ativo ---")
     if ativosM:
@@ -16,45 +35,70 @@ def cadastro_ativo():
     else:
         id_ativo = 1
 
-    name = input("Selecione o nome do ativo que você queira cadastrar: ")
+    name = input("Nome/hostname do ativo: ")
+    responsavel = input("Responsável pelo ativo: ")
+    setor = input("Setor/localização do ativo: ")
 
     print("Selecione o tipo do ativo\n")
-    for _ in tipo_ativo:
-        print(f"{_.value}. {_.name}")
+    for t in tipo_ativo:
+        print(f"{t.value}. {t.name}")
+
     try:
-        escolhido = int(input("Escolha o número do tipo:"))
+        escolhido = int(input("Escolha o número do tipo: "))
         tipo = tipo_ativo(escolhido)
 
         ativosM[id_ativo] = {
             "nome": name,
-            "tipo": tipo.name
+            "responsavel": responsavel,
+            "setor": setor,
+            "tipo": tipo.name,
+            "vulnerabilidades": []
         }
 
-        print(f"Sucesso! o {name} foi cadastrado!")
+        print(f"Sucesso! O ativo {name} foi cadastrado com ID {id_ativo}!")
+        salvar_dados(ativosM)
     except ValueError:
-        print("Entrada Inválida, tente novamente!")
+        print("Entrada inválida, tente novamente!")
 
-    
+
 def lista_ativos():
     print("\n --- Listando Ativos ---")
     if not ativosM:
         print("Nenhum ativo cadastrado no momento!")
     else:
-        for ativo in ativosM:
-            print(f"ID: {id_ativo} | Nome: {dados['nome']} | Tipo: {dados['tipo']}")
-            
+        for id_ativo, dados in ativosM.items():
+            print(f"ID: {id_ativo} | Nome: {dados['nome']} | Responsável: {dados['responsavel']} "
+                  f"| Setor: {dados['setor']} | Tipo: {dados['tipo']}")
+
+
 def loc_ativo():
     print("\n --- Buscando Ativo ---")
     if not ativosM:
-        print("Nenhum arquivo cadastrado")
-        return 
-    search = input("Digite o ID do arquivo: ")
-    if search.isdigit():
-        id_search = int(busca)
-        if id_search in ativosM:
-            dados = ativosM[id_search]
-        print(f"ID: {id_search} | Nome: {dados['nome']} | Responsável: {dados['responsavel']} | Setor: {dados['setor']}") | Tipo: {dados['tipo']}")
-        return 
+        print("Nenhum ativo cadastrado no momento!")
+        return
+
+    busca = input("Digite o ID ou o nome/hostname do ativo: ").strip()
+
+    if busca.isdigit():
+        id_busca = int(busca)
+        if id_busca in ativosM:
+            dados = ativosM[id_busca]
+            print(f"ID: {id_busca} | Nome: {dados['nome']} | Responsável: {dados['responsavel']} "
+                  f"| Setor: {dados['setor']} | Tipo: {dados['tipo']}")
+            return
+
+    encontrados = [
+        (id_a, dados) for id_a, dados in ativosM.items()
+        if dados["nome"].lower() == busca.lower()
+    ]
+
+    if encontrados:
+        for id_a, dados in encontrados:
+            print(f"ID: {id_a} | Nome: {dados['nome']} | Responsável: {dados['responsavel']} "
+                  f"| Setor: {dados['setor']} | Tipo: {dados['tipo']}")
+    else:
+        print("Nenhum ativo encontrado com esse ID ou nome.")
+
 
 def att_ativo():
     print("\n --- Atualizando Ativo ---")
@@ -87,6 +131,8 @@ def att_ativo():
         dados["setor"] = novo_setor
 
     print("Ativo atualizado com sucesso!")
+    salvar_dados(ativosM)
+
 
 def del_ativo():
     print("\n --- Excluindo Ativo ---")
@@ -107,6 +153,8 @@ def del_ativo():
     nome = ativosM[id_ativo]["nome"]
     del ativosM[id_ativo]
     print(f"Ativo {nome} (e suas vulnerabilidades) foi excluído com sucesso!")
+    salvar_dados(ativosM)
+
 
 def cadastro_vulnerabilidade():
     print("\n --- Cadastrando Vulnerabilidade ---")
@@ -150,10 +198,12 @@ def cadastro_vulnerabilidade():
         })
 
         print("Vulnerabilidade cadastrada com sucesso!")
+        salvar_dados(ativosM)
     except ValueError:
         print("Entrada inválida, tente novamente!")
 
-def visualizar_vulnerabilidades():
+
+def visu_vulnerabilidade():
     print("\n --- Vulnerabilidades do Ativo ---")
     if not ativosM:
         print("Nenhum ativo cadastrado no momento!")
@@ -177,20 +227,18 @@ def visualizar_vulnerabilidades():
         for i, v in enumerate(vulns, start=1):
             print(f"{i}. {v['descricao']} | Categoria: {v['categoria']} "
                   f"| Severidade: {v['severidade']} | Status: {v['status']}")
-
-
-
-ativosM = {}
-
 ### construindo a função para printar o menu e pedir a opção do usuário para deixar o código mais limpo e legível
 def menu():
-     print("\n --- Menu de Gerenciamento de Ativos ---")
-     print("1. Cadastrar Ativo")
-     print("2. Listar Ativos")
-     print("3. Buscar Ativo")
-     print("4. Atualizar Ativo")
-     print("5. Excluir Ativo")
-     print("0. Sair")
+    print("\n --- Menu de Gerenciamento de Ativos ---")
+    print("1. Cadastrar Ativo")
+    print("2. Listar Ativos")
+    print("3. Buscar Ativo")
+    print("4. Atualizar Ativo")
+    print("5. Excluir Ativo")
+    print("6. Cadastrar Vulnerabilidades")
+    print("7. Visualizar Vulnerabilidades")
+    print("0. Sair")
+
 #Dispatch Table para boas práticas e aproveitamento de memória
 opcoes = {
     "1": cadastro_ativo,
@@ -198,8 +246,11 @@ opcoes = {
     "3": loc_ativo,
     "4": att_ativo,
     "5": del_ativo,
+    "6": cadastro_vulnerabilidade,
+    "7": visu_vulnerabilidade,
 }
-# Aqui eu chamo a função main, crio o loop com apenas uma condicional e quebro ele se a pessoa escolher 0, criando esse feedback interativo
+
+# Aqui eu chamo a função main, crio o loop com poucas condicionais e quebro ele se a pessoa escolher 0, criando esse feedback interativo
 def main():
     while True:
         menu()
@@ -208,14 +259,14 @@ def main():
         if opcao == "0":
             print("Saindo do programa...")
             break
-        #O get pega o input do usuário e analisa atráves da key do dict respectivo; também coloco uma condição para evitar que a pessoa escolha uma opção incorreta
-        # e printando a string respectiva a key que o cara escolheu 
+
         user_input = opcoes.get(opcao)
 
         if user_input is None:
             print("Opção inválida. Tente novamente.")
         else:
             user_input()
+
 
 if __name__ == "__main__":
     main()
