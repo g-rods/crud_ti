@@ -1,5 +1,6 @@
 from enum import Enum
 from persistencia import salvar_dados, carregar_dados
+import random
 
 # enumeração para os tipos de ativos
 class tipo_ativo(Enum):
@@ -30,11 +31,9 @@ ativosM = carregar_dados()
 ## funções
 def cadastro_ativo():
     print("\n --- Cadastrando Ativo ---")
-    if ativosM:
-        id_ativo = max(ativosM.keys()) + 1
-    else:
-        id_ativo = 1
-
+    id_ativo = random.randint(1000, 9999)
+    while id_ativo in ativosM:
+        id_ativo = random.randint(1000, 9999)
     name = input("Nome/hostname do ativo: ")
     responsavel = input("Responsável pelo ativo: ")
     setor = input("Setor/localização do ativo: ")
