@@ -36,10 +36,14 @@ def cadastro_ativo():
         id_ativo = random.randint(1000, 9999)
     name = input("Nome/hostname do ativo: ").strip()
     while not name:
-        name = input("O nome não pode ser vazio. Digite novamente:").strip
+        name = input("O nome não pode ser vazio. Digite novamente:").strip()
 
-    responsavel = input("Responsável pelo ativo: ")
+    responsavel = input("Responsável pelo ativo: ").strip()
+    while not responsavel:
+        responsavel = input("O Responsável não pode ser vazio. Digite novamente: ")
     setor = input("Setor/localização do ativo: ")
+    while not setor:
+        setor = input("O setor não pode ser vazio. Digite novamente: ")
 
     print("Selecione o tipo do ativo\n")
     for t in tipo_ativo:
