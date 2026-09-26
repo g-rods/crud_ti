@@ -34,7 +34,10 @@ def cadastro_ativo():
     id_ativo = random.randint(1000, 9999)
     while id_ativo in ativosM:
         id_ativo = random.randint(1000, 9999)
-    name = input("Nome/hostname do ativo: ")
+    name = input("Nome/hostname do ativo: ").strip()
+    while not name:
+        name = input("O nome não pode ser vazio. Digite novamente:").strip
+
     responsavel = input("Responsável pelo ativo: ")
     setor = input("Setor/localização do ativo: ")
 
